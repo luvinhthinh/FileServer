@@ -2,23 +2,23 @@ package utils;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileInputStream;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Properties;
 
 public class Utility {
-	private static String defautMessageBundle = "bin/messageBundle.properties";
-	private static String defautAppConfig = "bin/app.properties";
-	private static Properties messageBundle, appConfig;
+	private static String defautMessageBundle = "messageBundle.properties";
+	private static String defautAppConfig = "app.properties";
+	private static String defautContentTypeMapping = "contentType.properties";
+	private static Properties messageBundle, appConfig, contenTypeMapping;
 	
 	private static Properties load(String fileName){
 		try{
+			
 			System.out.println("Loading... " + fileName);
 			Properties props = new Properties();
-			props.load(new FileInputStream(new File(fileName)));
+			props.load(Utility.class.getClassLoader().getResourceAsStream(fileName));
 			return props;
 		}catch(FileNotFoundException fnfE){
 			System.err.println("File not found : " + fileName);
@@ -42,6 +42,13 @@ public class Utility {
 		return messageBundle;
 	}
 	
+	private static Properties getContentTypeMapping(){
+		if(contenTypeMapping == null){
+			contenTypeMapping = load(defautContentTypeMapping);
+		}	
+		return contenTypeMapping;
+	}
+	
 	private static String getProperty(String key){
 		return messageBundle.getProperty(key);
 	}
@@ -50,8 +57,17 @@ public class Utility {
 		return getMessageBundle().getProperty("error."+msg) == null ? null : new MessageFormat(getProperty("error."+msg)).format(params);
 	}
 	
+	public static String getLabel(String msg){
+		return getMessageBundle().getProperty("label."+msg);
+	}
+	
 	public static String getConfig(String name){
 		return getAppConfig().getProperty(name);
+	}
+	
+	public static String getContentType(String fileType){
+		String contentType = getContentTypeMapping().getProperty(fileType);
+		return contentType == null ? Constants.DEFAULT_CONTENT_TYPE : contentType;
 	}
 	
 	public static String readFileToString(String file){

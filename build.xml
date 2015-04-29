@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="FileServer" basedir="." default="build">
+
+    <target name="clean" description="Delete all generated files">
+        <delete dir="bin"/>
+    	<delete dir="dist"/>
+    </target>
+
+    <target name="compile" description="Compiles code">
+    	<mkdir dir="bin"/>
+        <javac srcdir="src/main/java" destdir="bin"/>
+    	<copy todir="bin">
+    	    <fileset dir="src/main/resources"
+    	             includes="*.*" />
+    	</copy>
+    </target>
+
+    <target name="build" description="compile and package" depends="clean, compile">
+    	<mkdir dir="dist/jar"/>
+        <jar destfile="dist/jar/fileServer.jar" basedir="bin">
+    		<manifest>
+                <attribute name="Main-Class" value="FileServlet"/>
+            </manifest>
+        </jar>
+    </target>
+	
+	<target name="run" description="run servlet on 8080">
+        <java jar="dist/jar/FileServer.jar" fork="true" args="8080"/>
+    </target>
+
+</project>

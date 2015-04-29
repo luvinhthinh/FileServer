@@ -2,6 +2,7 @@ package handlers;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -17,7 +18,7 @@ public class ErrorHandler implements HttpHandler{
 	
 	public void handle(HttpExchange x) throws IOException{
 		String response = Utility.getMessage(this.errorMsg, null);
-		x.sendResponseHeaders(200, response.length());
+		x.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length());
 		OutputStream os = x.getResponseBody();
         os.write(response.getBytes());
         os.close();
