@@ -1,23 +1,28 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="FileServer" basedir="." default="build">
+	<property name="src.dir" 	value="src/main/java"/>
+	<property name="resources.dir" value="src/main/resources"/>
+	<property name="test.dir" 	value="src/test/java"/>
+	<property name="build.dir"  value="bin"/>
+	<property name="dist.dir"   value="dist/jar"/>
+	<property name="dist.file"   value="fileServer.jar"/>
 
     <target name="clean" description="Delete all generated files">
-        <delete dir="bin"/>
-    	<delete dir="dist"/>
+        <delete dir="${src.dir}"/>
+    	<delete dir="${dist.dir}"/>
     </target>
 
     <target name="compile" description="Compiles code">
-    	<mkdir dir="bin"/>
-        <javac srcdir="src/main/java" destdir="bin"/>
-    	<copy todir="bin">
-    	    <fileset dir="src/main/resources"
-    	             includes="*.*" />
+    	<mkdir dir="${build.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${build.dir}"/>
+    	<copy todir="${build.dir}">
+    	    <fileset dir="${resources.dir}" includes="*.*" />
     	</copy>
     </target>
 
     <target name="build" description="compile and package" depends="clean, compile">
-    	<mkdir dir="dist/jar"/>
-        <jar destfile="dist/jar/fileServer.jar" basedir="bin">
+    	<mkdir dir="${dist.dir}"/>
+        <jar destfile="${dist.dir}/${dist.file}" basedir="${build.dir}">
     		<manifest>
                 <attribute name="Main-Class" value="FileServlet"/>
             </manifest>
@@ -25,7 +30,7 @@
     </target>
 	
 	<target name="run" description="run servlet on 8080">
-        <java jar="dist/jar/FileServer.jar" fork="true" args="8080"/>
+        <java jar="${dist.dir}/${dist.file}" fork="true" args="8080"/>
     </target>
 
 </project>
