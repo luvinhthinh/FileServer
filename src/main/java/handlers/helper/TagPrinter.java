@@ -17,4 +17,8 @@ public class TagPrinter {
 	public String printTag_link(String location, String text){
 		return "<tr><td><a href=\""+location+"\">"+text+"</a></td></tr>";
 	}
+	
+	public String printTag_link(String location, String text, String type){
+		return "<tr><td width=\"10%\">"+type+"</td><td><a href=\""+location+"\">"+text+"</a></td></tr>";
+	}
 }

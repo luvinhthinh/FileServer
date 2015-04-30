@@ -65,7 +65,7 @@ public class ServiceTest {
 	}
 	
 	@Test
-	public void test_homeDirectory() throws Exception{
+	public void test_homeDirectory_default() throws Exception{
 		HttpURLConnection connection = doGET(localhost + contextPath);
 		String response = getResponseContent(connection);
 		Assert.assertEquals(200, connection.getResponseCode());
@@ -76,7 +76,47 @@ public class ServiceTest {
 		Assert.assertTrue(response.contains("file1"));
 		Assert.assertTrue(response.contains("file2"));
 		
-		Assert.assertTrue(response.contains("<tr><td><a href=\""+localhost+contextPath+"/content/htmlFolder\">htmlFolder</a></td></tr>"));
+		Assert.assertTrue(response.contains("<td><a href=\""+localhost+contextPath+"/content/htmlFolder\">htmlFolder</a></td>"));
+	}
+	
+	@Test
+	public void test_homeDirectory() throws Exception{
+		HttpURLConnection connection = doGET(localhost + contextPath+ "/content");
+		String response = getResponseContent(connection);
+		Assert.assertEquals(200, connection.getResponseCode());
+		Assert.assertTrue(response.contains("htmlFolder"));
+		Assert.assertTrue(response.contains("imageFolder"));
+		Assert.assertTrue(response.contains("pdfFolder"));
+		Assert.assertTrue(response.contains("textFolder"));
+		Assert.assertTrue(response.contains("file1"));
+		Assert.assertTrue(response.contains("file2"));
 		
+		Assert.assertTrue(response.contains("<td><a href=\""+localhost+contextPath+"/content/htmlFolder\">htmlFolder</a></td>"));
+	}
+	
+	@Test
+	public void test_subDirectory() throws Exception{
+		HttpURLConnection connection = doGET(localhost + contextPath+ "/content/textFolder");
+		String response = getResponseContent(connection);
+		Assert.assertEquals(200, connection.getResponseCode());
+		Assert.assertTrue(response.contains("folder21"));
+		Assert.assertTrue(response.contains("folder22"));
+		Assert.assertTrue(response.contains("textFile1.txt"));
+	}
+	
+	@Test
+	public void test_openFile_text() throws Exception{
+		HttpURLConnection connection = doGET(localhost + contextPath+ "/content/textFolder/textFile1.txt");
+		String response = getResponseContent(connection);
+		Assert.assertEquals(200, connection.getResponseCode());
+		Assert.assertEquals("This is test file 1", response);
+	}
+	
+	@Test
+	public void test_openFile_image() throws Exception{
+		HttpURLConnection connection = doGET(localhost + contextPath+ "/content/imageFolder/imageFile1.png");
+		String response = getResponseContent(connection);
+		Assert.assertEquals(200, connection.getResponseCode());
+		Assert.assertNotNull(response);
 	}
 }

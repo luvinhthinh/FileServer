@@ -32,18 +32,8 @@ public class DirectoryHandler implements HttpHandler{
 			String filename = file.getName();
 			content.append(
 					tagPrinter.printTag_row(
-							tagPrinter.printTag_link("http://"+this.url+"/"+filename, filename),
-							file.isDirectory() ? Utility.getLabel(Constants.LABEL_DIRECTORY) : ""
+							tagPrinter.printTag_link("http://"+this.url+"/"+filename, filename, file.isDirectory() ? Utility.getLabel(Constants.LABEL_DIRECTORY) : "")
 						));
-//			if(file.isDirectory()){
-//				content.append(
-//						tagPrinter.printTag_row(
-//								tagPrinter.printTag_link("http://"+this.url+"/"+filename, filename)));
-//			}else{
-//				content.append(
-//						tagPrinter.printTag_row(
-//								filename));
-//			}
 		}
 
 		String response = htmlTemplate.replace(Constants.HTML_TEMPLATE_CONTENT, content.toString());
