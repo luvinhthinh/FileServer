@@ -6,38 +6,75 @@
 	<property name="test.dir" 	value="src/test/java"/>
 	<property name="build.dir"  	value="bin"/>
 	<property name="dist.dir"   	value="dist/jar"/>
-	<property name="dist.file"   	value="fileServer.jar"/>
+	<property name="dist.src.file"   	value="fileServer.jar"/>
+	<property name="dist.test.file"   	value="fileServerTest.jar"/>
+	<property name="report.dir"   	value="${build.dir}/junitReport"/>
 	
-	<path id="fileServer" location="${jar.dir}/${ant.project.name}.jar"/>
+	<path id="application" location="${dist.dir}/${dist.test.file}.jar"/>
+	
+	<path id="junitClasspath">
+	    	<fileset dir="${lib.dir}" includes="*.jar"/>
+		</path>
+	
 	<path id="classpath">
-        	<fileset dir="${lib.dir}" includes="**/*.jar"/>
-        	<fileset dir="${dist.dir}" includes="**/*.jar"/>
-    	</path>
+    	<fileset dir="${lib.dir}" includes="*.jar"/>
+    	<fileset dir="${dist.dir}" includes="**/*.jar"/>
+	</path>
 
     <target name="clean" description="Delete all generated files">
-        <delete dir="${src.dir}"/>
+        <delete dir="${build.dir}"/>
     	<delete dir="${dist.dir}"/>
     </target>
 
-    <target name="compile" description="Compiles code">
+    <target name="compileJava" description="Compiles source code">
     	<mkdir dir="${build.dir}"/>
         <javac srcdir="${src.dir}" destdir="${build.dir}"/>
     	<copy todir="${build.dir}">
     	    <fileset dir="${resources.dir}" includes="*.*" />
     	</copy>
     </target>
-
-    <target name="build" description="compile and package" depends="clean, compile">
+	
+	<target name="compileTest" description="Compiles test code">
+    	<mkdir dir="${build.dir}"/>
+        <javac srcdir="${test.dir}" destdir="${build.dir}" classpathref="junitClasspath"/>
+    </target>
+	
+	<target name="build" description="compile and package" depends="clean, compileJava, compileTest">
     	<mkdir dir="${dist.dir}"/>
-        <jar destfile="${dist.dir}/${dist.file}" basedir="${build.dir}">
+        <jar destfile="${dist.dir}/${dist.src.file}" basedir="${build.dir}">
     		<manifest>
-                <attribute name="Main-Class" value="FileServlet"/>
+                <attribute name="Main-Class" value="servlet.FileServlet"/>
             </manifest>
         </jar>
+		<jar destfile="${dist.dir}/${dist.test.file}" basedir="${build.dir}"/>
     </target>
 	
 	<target name="run" description="deploy servlet on 8080">
-        <java jar="${dist.dir}/${dist.file}" fork="true" args="8080"/>
+        <java jar="${dist.dir}/${dist.src.file}" fork="true" args="8080"/>
+    </target>
+	
+	<target name="junit" depends="compileTest">
+		<delete dir="${report.dir}"/>
+		<mkdir dir="${report.dir}"/>
+        <junit printsummary="yes">
+        	<classpath>
+		         <pathelement path="${build.dir}"/>
+		    </classpath>
+		    <classpath refid="classpath"/>
+        	
+        	<formatter type="xml"/>
+            
+            <batchtest fork="yes" todir="${report.dir}">
+                <fileset dir="${test.dir}" includes="**/*Test.java"/>
+            </batchtest>
+        </junit>
+    </target>
+	
+	<target name="report">
+        <junitreport todir="${report.dir}">
+            <fileset dir="${report.dir}" includes="TEST-*.xml"/>
+            <report todir="${report.dir}"/>
+        </junitreport>
     </target>
 
 </project>

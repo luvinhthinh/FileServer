@@ -1,3 +1,4 @@
+package servlet;
 
 import handlers.ViewHandler;
 
@@ -33,6 +34,15 @@ public class FileServlet{
 		}catch(BindException be){
 			System.err.println("Port already in use. Please choose different port");
 		}catch(IOException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void stop(){
+		try{
+			this.server.stop(0);
+			System.out.println("Server stopped !");
+		}catch(Exception e){
 			e.printStackTrace();
 		}
 	}

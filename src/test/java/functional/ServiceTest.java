@@ -1,17 +1,18 @@
 package functional;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import org.junit.Assert;
-import org.junit.Test;
+import servlet.FileServlet;
+import junit.framework.Assert;
 
-public class ServiceTest {
-	private static String localhost = "http://localhost:8080";
+public class ServiceTest extends junit.framework.TestCase{
+	private FileServlet fs;
+	private static int port = 8080;
+	private static String localhost = "http://localhost:"+port;
 	private static String contextPath = "/view";
 	private final String USER_AGENT = "Mozilla/5.0";
 	
@@ -38,13 +39,21 @@ public class ServiceTest {
 		return response.toString();
 	}
 	
-	@Test
+	protected void setUp() {
+		FileServlet fs = new FileServlet(port, contextPath);
+		fs.start();
+    }
+	
+	protected void tearDown(){
+		fs.stop();
+	}
+	
 	public void test_wrongContextPath() throws Exception{
 		HttpURLConnection connection = doGET(localhost + "/test");
 		Assert.assertEquals(404, connection.getResponseCode());
 	}
 	
-	@Test
+
 	public void test_sendPOST() throws Exception{
 		String url = localhost + contextPath;
 		URL obj = new URL(url);
@@ -57,14 +66,14 @@ public class ServiceTest {
 		Assert.assertEquals("Sorry guys ! Only support GET at the moment", getResponseContent(connection));
 	}
 	
-	@Test
+
 	public void test_NonExistFile() throws Exception{
 		HttpURLConnection connection = doGET(localhost + contextPath + "/test");
 		Assert.assertEquals(200, connection.getResponseCode());
 		Assert.assertEquals("No such file or directory.", getResponseContent(connection));
 	}
 	
-	@Test
+
 	public void test_homeDirectory_default() throws Exception{
 		HttpURLConnection connection = doGET(localhost + contextPath);
 		String response = getResponseContent(connection);
@@ -79,7 +88,7 @@ public class ServiceTest {
 		Assert.assertTrue(response.contains("<td><a href=\""+localhost+contextPath+"/content/htmlFolder\">htmlFolder</a></td>"));
 	}
 	
-	@Test
+
 	public void test_homeDirectory() throws Exception{
 		HttpURLConnection connection = doGET(localhost + contextPath+ "/content");
 		String response = getResponseContent(connection);
@@ -94,7 +103,7 @@ public class ServiceTest {
 		Assert.assertTrue(response.contains("<td><a href=\""+localhost+contextPath+"/content/htmlFolder\">htmlFolder</a></td>"));
 	}
 	
-	@Test
+
 	public void test_subDirectory() throws Exception{
 		HttpURLConnection connection = doGET(localhost + contextPath+ "/content/textFolder");
 		String response = getResponseContent(connection);
@@ -104,7 +113,7 @@ public class ServiceTest {
 		Assert.assertTrue(response.contains("textFile1.txt"));
 	}
 	
-	@Test
+
 	public void test_openFile_text() throws Exception{
 		HttpURLConnection connection = doGET(localhost + contextPath+ "/content/textFolder/textFile1.txt");
 		String response = getResponseContent(connection);
@@ -112,9 +121,16 @@ public class ServiceTest {
 		Assert.assertEquals("This is test file 1", response);
 	}
 	
-	@Test
+
 	public void test_openFile_image() throws Exception{
 		HttpURLConnection connection = doGET(localhost + contextPath+ "/content/imageFolder/imageFile1.png");
+		String response = getResponseContent(connection);
+		Assert.assertEquals(200, connection.getResponseCode());
+		Assert.assertNotNull(response);
+	}
+	
+	public void test_openFile_pdf() throws Exception{
+		HttpURLConnection connection = doGET(localhost + contextPath+ "/content/pdfFolder/pdfFile1.pdf");
 		String response = getResponseContent(connection);
 		Assert.assertEquals(200, connection.getResponseCode());
 		Assert.assertNotNull(response);

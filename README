@@ -4,85 +4,96 @@
         1) Go to the project folder
         2) Execute : ant build
            Output : dist/jar/fileServer.jar
-        3) Execute : java -jar dist/jar/fileServer.jar <port>
+        3) Run by command line: 
+            java -jar dist/jar/fileServer.jar <port> 
 
 2. How to test
-    Tool : JUnit
+    Tool : Apache Ant and JUnit (v4.2)
     Instruction : 
-    	1) Go to the project folder
-    	2) execute : ant junit
-    	
+        1) Open one terminal 
+        2) Go to the project folder
+        3) Execute : ant build junit
+        
 3. Explanation
 
     a) General Idea : 
-	. Using HttpHandler interface in controller level
-	. Implement different handlers to serve different types of file
-	. Externalize resources
-		
+    . Using HttpHandler interface in controller level
+    . Implement different handlers to serve different types of file
+    . Externalize resources
+        
     b) Control Flow : 
-	. Create a HTTP server with port inputed from user and default context path /view
-	    - No Port 		  : Print help
-	    - Port already in use : Print error, ask for different port
-	. Load resources (Constants, properties)
-	. Hand over control to ViewHandler
-	. ViewHandler check and hand over control to ErrorHandler if: 
-	    - Request method is not GET
-	    - Directory/file is using absolute path
-	    - Directory/file not exist
-	    - Directory/file is read-protected (Maybe due to permission denied)
-	. ViewHandler hand over control to DirectoryHandler if directory is requested
-	. ViewHandler hand over control to FileHandler if file is requested
-	. DirectoryHandler does:
-   	    - retrieve the HTML template file
-	    - read the content of the requested directory
-	    - mask the content with html tag
-	    - replace the HTML body with content
-	    - return response
-	    - hand over control to ErrorHandler if an error is encountered
-	. FileHandler does:
-	    - get file type
-	    - if file type cannot be decided, use default Content-Type as text/plain
-	    - if file type is recognized, set the Content-Type accordingly
-	    - read content of the file
-	    - set the content to response body
-	    - return response
-	    - hand over control to ErrorHandler if an error is encountered
-		
-    c) File function :
-		
-	+ Resources :
-	    . app.properties		: Configuration file for application( default context path, 
-	    				  home directory to view, html template files)
-	    . contentType.properties 	: Mapping file extension to Content-Type accordingly
-	    . messageBundle.properties 	: Contains error messages
-	    . template.html		: Template HTML file for showing content of a directory. The 
-	    				  body of this HTML will be replaced by directory content.
-		
-	+ Source code : 
-	    . FileServlet.java		: Main class. Instantiate http server.
-	    . Constants.java		: Contains all the constants of the application
-	    . Utility.java		: Utility class, declared as static. Main usage is to load .properties file;
-					  property files are supposed to be loaded once when first called, and reused subsequently.
-	    . TagPrinter.java		: Helper class for masking the content with HTML tag
-	    . ViewHandler.java		: Implement HttpHandler, act as middle man to delegate tasks to proper handlers.
-	    . ErrorHandler.java		: Implement HttpHandler, handle errors
-	    . DirectoryHandler.java	: Implement HttpHandler, handle request to view directory content
-	    . FileHandler.java		: Implement HttpHandler, handle request to view file content
-	
+    . Create a HTTP server with port inputed from user and default context path /view
+        - No Port             : Print help
+        - Port already in use : Print error, ask for different port
+    . Load resources (Constants, properties)
+    . Hand over control to ViewHandler
+    . ViewHandler check and hand over control to ErrorHandler if: 
+        - Request method is not GET
+        - Directory/file is using absolute path
+        - Directory/file not exist
+        - Directory/file is read-protected (Maybe due to permission denied)
+    . ViewHandler hand over control to DirectoryHandler if directory is requested
+    . ViewHandler hand over control to FileHandler if file is requested
+    . DirectoryHandler does:
+           - retrieve the HTML template file
+        - read the content of the requested directory
+        - mask the content with html tag
+        - replace the HTML body with content
+        - return response
+        - hand over control to ErrorHandler if an error is encountered
+    . FileHandler does:
+        - get file type
+        - if file type cannot be decided, use default Content-Type as text/plain
+        - if file type is recognized, set the Content-Type accordingly
+        - read content of the file
+        - set the content to response body
+        - return response
+        - hand over control to ErrorHandler if an error is encountered
+        
+    c) File Description :
+        
+    + Directories : 
+        . src/main/java       : main application source code
+        . src/main/resources  : main application resources
+        . src/test/java       : test classes
+        . bin                 : compiled classes
+        . lib                 : third party libraries
+        . dist                : files for distribution
+        . content             : home directory for testing
+            
+    + Resources :
+        . app.properties           : Configuration file for application( default context path, 
+                                     home directory to view, html template files)
+        . contentType.properties   : Mapping file extension to Content-Type accordingly
+        . messageBundle.properties : Contains error messages
+        . template.html            : Template HTML file for showing content of a directory. The 
+                                     body of this HTML will be replaced by directory content.
+        
+    + Source code : 
+        . FileServlet.java      : Main class. Instantiate http server.
+        . Constants.java        : Contains all the constants of the application
+        . Utility.java          : Utility class, declared as static. Main usage is to load .properties file;
+                                  property files are supposed to be loaded once when first called, and reused subsequently.
+        . TagPrinter.java       : Helper class for masking the content with HTML tag
+        . ViewHandler.java      : Implement HttpHandler, act as middle man to delegate tasks to proper handlers.
+        . ErrorHandler.java     : Implement HttpHandler, handle errors
+        . DirectoryHandler.java : Implement HttpHandler, handle request to view directory content
+        . FileHandler.java      : Implement HttpHandler, handle request to view file content
+    
     d) Note : 
-	- Utilizing .properties file : Make application extendable without recompiling code.
+    - Utilizing .properties file to make application extendable without recompiling code.
 
 4. To be improved
-	- enable different file types (video, music, ...) in FileHandler
-	- improve HTML page for viewing directory (at least as good as Google Drive )
-	- do profiling for memory consumption and leak finding
-	- do load test to measure servlet performance
-	- harden security by using HTTPS
-	- implement monitoring and auto restart( to know when the service is down and automatically bring the service up whenever it is down)
-	- plan scalability( deploy two instances with a load balancer in front to achieve no single point of failure and high availability)
-	- utilize cache (this is to serve static text, caching will really help)
-	- change response data to JSON for future integration with other application
-	 
-		
-		
-	
+    - enable different file types (video, music, ...) in FileHandler
+    - improve HTML page for viewing directory (at least as good as Google Drive )
+    - do profiling for memory consumption and leak finding
+    - do load test to measure servlet performance
+    - harden security by using HTTPS
+    - implement monitoring and auto restart( to know when the service is down and automatically bring the service up whenever it is down)
+    - plan scalability( deploy two instances with a load balancer in front to achieve no single point of failure and high availability)
+    - utilize cache (this is to serve static text, caching will really help)
+    - change response data to JSON for future integration with other application
+     
+        
+        
+    
