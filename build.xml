@@ -2,10 +2,17 @@
 <project name="FileServer" basedir="." default="build">
 	<property name="src.dir" 	value="src/main/java"/>
 	<property name="resources.dir" value="src/main/resources"/>
+	<property name="lib.dir" 	value="lib"/>
 	<property name="test.dir" 	value="src/test/java"/>
-	<property name="build.dir"  value="bin"/>
-	<property name="dist.dir"   value="dist/jar"/>
-	<property name="dist.file"   value="fileServer.jar"/>
+	<property name="build.dir"  	value="bin"/>
+	<property name="dist.dir"   	value="dist/jar"/>
+	<property name="dist.file"   	value="fileServer.jar"/>
+	
+	<path id="fileServer" location="${jar.dir}/${ant.project.name}.jar"/>
+	<path id="classpath">
+        	<fileset dir="${lib.dir}" includes="**/*.jar"/>
+        	<fileset dir="${dist.dir}" includes="**/*.jar"/>
+    	</path>
 
     <target name="clean" description="Delete all generated files">
         <delete dir="${src.dir}"/>
@@ -29,7 +36,7 @@
         </jar>
     </target>
 	
-	<target name="run" description="run servlet on 8080">
+	<target name="run" description="deploy servlet on 8080">
         <java jar="${dist.dir}/${dist.file}" fork="true" args="8080"/>
     </target>
 
