@@ -38,6 +38,7 @@
 	    - mask the content with html tag
 	    - replace the HTML body with content
 	    - return response
+	    - hand over control to ErrorHandler if an error is encountered
 	. FileHandler does:
 	    - get file type
 	    - if file type cannot be decided, use default Content-Type as text/plain
@@ -45,6 +46,7 @@
 	    - read content of the file
 	    - set the content to response body
 	    - return response
+	    - hand over control to ErrorHandler if an error is encountered
 		
     c) File function :
 		
